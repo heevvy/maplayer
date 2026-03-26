@@ -29,7 +29,29 @@
   const config = SITE_CONFIG[hostname];
   if (!config) return;
 
+  const isNetflix = hostname === 'www.netflix.com';
   let pipActive = false;
+
+  if (isNetflix) {
+    const s = document.createElement('script');
+    s.textContent = `
+      window.addEventListener('message', function(e) {
+        if (!e.data || e.data.source !== 'maplayer') return;
+        try {
+          var vp = netflix.appContext.state.playerApp.getAPI().videoPlayer;
+          var sid = vp.getAllPlayerSessionIds()[0];
+          if (!sid) return;
+          var player = vp.getVideoPlayerBySessionId(sid);
+          if (e.data.action === 'seek') player.seek(e.data.timeMs);
+          if (e.data.action === 'playpause') {
+            if (player.isPaused()) player.play(); else player.pause();
+          }
+        } catch(err) {}
+      });
+    `;
+    (document.head || document.documentElement).appendChild(s);
+    s.remove();
+  }
 
   function findVideo() {
     return document.querySelector(config.videoSelector) || document.querySelector('video');
@@ -41,6 +63,26 @@
       if (btn && btn.offsetParent !== null) { btn.click(); return; }
     }
     if (config.handleUnskippableAd) config.handleUnskippableAd(findVideo());
+  }
+
+  function seekVideo(timeSec) {
+    if (isNetflix) {
+      window.postMessage({ source: 'maplayer', action: 'seek', timeMs: timeSec * 1000 }, '*');
+      return;
+    }
+    try {
+      const video = findVideo();
+      if (video) video.currentTime = timeSec;
+    } catch (e) {}
+  }
+
+  function playPauseVideo() {
+    if (isNetflix) {
+      window.postMessage({ source: 'maplayer', action: 'playpause' }, '*');
+      return;
+    }
+    const video = findVideo();
+    if (video) { if (video.paused) video.play(); else video.pause(); }
   }
 
   function togglePip() {
@@ -85,12 +127,10 @@
       return true;
     }
     if (msg.type === 'seek') {
-      const video = findVideo();
-      if (video && msg.time != null) video.currentTime = msg.time;
+      if (msg.time != null) seekVideo(msg.time);
     }
     if (msg.type === 'playpause') {
-      const video = findVideo();
-      if (video) { if (video.paused) video.play(); else video.pause(); }
+      playPauseVideo();
     }
   });
 
