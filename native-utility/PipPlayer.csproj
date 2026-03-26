@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <UseWindowsForms>true</UseWindowsForms>
+    <PublishSingleFile>true</PublishSingleFile>
+    <SelfContained>true</SelfContained>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <PublishTrimmed>false</PublishTrimmed>
+    <ApplicationIcon>app.ico</ApplicationIcon>
+    <Authors>dancar</Authors>
+    <Company>dancar</Company>
+    <Product>Maplayer</Product>
+    <AssemblyTitle>Maplayer</AssemblyTitle>
+    <Description>Game overlay PIP player</Description>
+    <Copyright>Copyright (c) dancar 2026</Copyright>
+  </PropertyGroup>
+
+</Project>

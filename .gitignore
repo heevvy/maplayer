@@ -1,0 +1,29 @@
+# Build output
+bin/
+obj/
+publish/
+
+# Node / Electron remnants
+node_modules/
+dist/
+package-lock.json
+
+# Build artifacts
+*.exe
+*.zip
+*.nupkg
+
+# Logs
+*.log
+*.log.mbtree
+
+# OS
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# IDE
+.vs/
+.vscode/
+*.user
+*.suo

@@ -1,0 +1,49 @@
+{
+  "manifest_version": 3,
+  "name": "Maplayer",
+  "version": "1.0.0",
+  "description": "게임 위에 영상을 오버레이하는 PIP 플레이어",
+  "author": "dancar",
+  "permissions": ["activeTab", "storage"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.youtube.com/*",
+        "https://www.netflix.com/*",
+        "https://chzzk.naver.com/*",
+        "https://play.sooplive.co.kr/*",
+        "https://vod.sooplive.co.kr/*",
+        "https://www.sooplive.com/*",
+        "https://sooplive.com/*",
+        "https://laftel.net/*",
+        "https://wp.nexon.com/*",
+        "https://watcha.com/*",
+        "https://www.watcha.com/*",
+        "https://www.primevideo.com/*",
+        "https://www.coupangplay.com/*",
+        "https://www.wavve.com/*",
+        "https://www.tving.com/*",
+        "https://www.disneyplus.com/*"
+      ],
+      "js": ["content.js"],
+      "run_at": "document_idle",
+      "all_frames": true
+    }
+  ],
+  "background": {
+    "service_worker": "service-worker.js"
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}

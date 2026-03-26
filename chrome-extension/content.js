@@ -1,0 +1,105 @@
+(() => {
+  const SITE_CONFIG = {
+    'www.youtube.com': {
+      videoSelector: 'video.html5-main-video',
+      adSkipSelectors: ['.ytp-ad-skip-button-modern', '.ytp-skip-ad-button', 'button[aria-label^="Skip"]', '.ytp-ad-skip-button'],
+      handleUnskippableAd(v) { if (v && document.querySelector('.ad-showing')) v.currentTime = v.duration || 0; },
+    },
+    'www.netflix.com': {
+      videoSelector: 'video',
+      adSkipSelectors: ['[data-uia="player-skip-intro"]', '[data-uia="player-skip-recap"]'],
+    },
+    'chzzk.naver.com': { videoSelector: 'video', adSkipSelectors: [] },
+    'play.sooplive.co.kr': { videoSelector: 'video', adSkipSelectors: [] },
+    'vod.sooplive.co.kr': { videoSelector: 'video', adSkipSelectors: [] },
+    'www.sooplive.com': { videoSelector: 'video', adSkipSelectors: [] },
+    'sooplive.com': { videoSelector: 'video', adSkipSelectors: [] },
+    'laftel.net': { videoSelector: 'video', adSkipSelectors: ['button.videoAdUiSkipButton'] },
+    'wp.nexon.com': { videoSelector: 'video', adSkipSelectors: [] },
+    'watcha.com': { videoSelector: 'video', adSkipSelectors: [] },
+    'www.watcha.com': { videoSelector: 'video', adSkipSelectors: [] },
+    'www.primevideo.com': { videoSelector: 'video', adSkipSelectors: ['.adSkipButton.skippable', '[data-testid="skip-ad-button"]', '.atvwebplayersdk-skipelements-button'] },
+    'www.coupangplay.com': { videoSelector: 'video', adSkipSelectors: [] },
+    'www.wavve.com': { videoSelector: 'video', adSkipSelectors: ['.btn_skip', 'button[class*="skip"]'] },
+    'www.tving.com': { videoSelector: 'video', adSkipSelectors: ['button[class*="skip"]', 'button[class*="Skip"]'] },
+    'www.disneyplus.com': { videoSelector: 'video', adSkipSelectors: ['.skip__button'] },
+  };
+
+  const hostname = window.location.hostname;
+  const config = SITE_CONFIG[hostname];
+  if (!config) return;
+
+  let pipActive = false;
+
+  function findVideo() {
+    return document.querySelector(config.videoSelector) || document.querySelector('video');
+  }
+
+  function trySkipAd() {
+    for (const sel of config.adSkipSelectors) {
+      const btn = document.querySelector(sel);
+      if (btn && btn.offsetParent !== null) { btn.click(); return; }
+    }
+    if (config.handleUnskippableAd) config.handleUnskippableAd(findVideo());
+  }
+
+  function togglePip() {
+    const video = findVideo();
+    if (!video) return Promise.reject(new Error('No video found'));
+    if (document.pictureInPictureElement) return document.exitPictureInPicture();
+    video.disablePictureInPicture = false;
+    chrome.runtime.sendMessage({ type: 'pip-prepare' });
+    return new Promise((resolve, reject) => {
+      setTimeout(() => video.requestPictureInPicture().then(resolve).catch(reject), 300);
+    });
+  }
+
+  setInterval(() => {
+    if (!pipActive) return;
+    const video = findVideo();
+    if (!video) return;
+    chrome.runtime.sendMessage({
+      type: 'send-to-native',
+      payload: {
+        type: 'playback-state',
+        currentTime: video.currentTime || 0,
+        duration: video.duration || 0,
+        paused: video.paused,
+      },
+    });
+  }, 500);
+
+  const adObserver = new MutationObserver(() => trySkipAd());
+  adObserver.observe(document.documentElement, { childList: true, subtree: true });
+  setInterval(trySkipAd, 2000);
+
+  chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+    if (msg.type === 'toggle-pip') {
+      togglePip()
+        .then(() => sendResponse({ success: true, pip: !!document.pictureInPictureElement }))
+        .catch(err => sendResponse({ success: false, error: err.message }));
+      return true;
+    }
+    if (msg.type === 'get-status') {
+      sendResponse({ hasVideo: !!findVideo(), isPip: !!document.pictureInPictureElement, site: hostname });
+      return true;
+    }
+    if (msg.type === 'seek') {
+      const video = findVideo();
+      if (video && msg.time != null) video.currentTime = msg.time;
+    }
+    if (msg.type === 'playpause') {
+      const video = findVideo();
+      if (video) { if (video.paused) video.play(); else video.pause(); }
+    }
+  });
+
+  document.addEventListener('enterpictureinpicture', () => {
+    pipActive = true;
+    chrome.runtime.sendMessage({ type: 'pip-state', active: true });
+  });
+  document.addEventListener('leavepictureinpicture', () => {
+    pipActive = false;
+    chrome.runtime.sendMessage({ type: 'pip-state', active: false });
+  });
+})();

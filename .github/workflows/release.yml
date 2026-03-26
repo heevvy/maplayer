@@ -1,0 +1,62 @@
+name: Build & Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Build native utility
+        working-directory: native-utility
+        run: dotnet publish -c Release -o ../artifacts/native
+
+      - name: Package Chrome extension
+        run: Compress-Archive -Path chrome-extension/* -DestinationPath artifacts/Maplayer_Chrome_Extension.zip
+
+      - name: Rename native executable
+        run: Copy-Item artifacts/native/PipPlayer.exe artifacts/Maplayer_Setup.exe
+
+      - name: Generate SHA-256 checksums
+        id: checksums
+        run: |
+          $exe = (Get-FileHash -Algorithm SHA256 artifacts/Maplayer_Setup.exe).Hash
+          $zip = (Get-FileHash -Algorithm SHA256 artifacts/Maplayer_Chrome_Extension.zip).Hash
+          "EXE_HASH=$exe" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          "ZIP_HASH=$zip" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          body: |
+            ## 다운로드
+
+            | 파일 | 설명 |
+            |------|------|
+            | `Maplayer_Setup.exe` | Windows 네이티브 유틸리티 (게임 오버레이) |
+            | `Maplayer_Chrome_Extension.zip` | Chrome 확장 프로그램 (수동 설치용) |
+
+            > **이 릴리스는 GitHub Actions에서 소스 코드로부터 자동 빌드되었습니다.**
+            > [빌드 로그](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})에서 빌드 과정을 직접 확인할 수 있습니다.
+
+            ### SHA-256 Checksums
+            ```
+            ${{ steps.checksums.outputs.EXE_HASH }}  Maplayer_Setup.exe
+            ${{ steps.checksums.outputs.ZIP_HASH }}  Maplayer_Chrome_Extension.zip
+            ```
+          files: |
+            artifacts/Maplayer_Setup.exe
+            artifacts/Maplayer_Chrome_Extension.zip
