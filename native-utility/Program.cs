@@ -15,8 +15,8 @@ var wsServer = new WebSocketServer(pip, game);
 var overlay = new OverlayForm(pip, game);
 wsServer.SetOverlay(overlay);
 
-var seekTimer = new System.Windows.Forms.Timer { Interval = 50 };
-seekTimer.Tick += async (_, _) =>
+var controlTimer = new System.Windows.Forms.Timer { Interval = 50 };
+controlTimer.Tick += async (_, _) =>
 {
     var seekTime = overlay.ConsumeSeekRequest();
     if (seekTime.HasValue)
@@ -24,8 +24,14 @@ seekTimer.Tick += async (_, _) =>
         await wsServer.BroadcastAsync(
             System.Text.Json.JsonSerializer.Serialize(new { type = "seek", time = seekTime.Value }));
     }
+
+    if (overlay.ConsumePlayPauseRequest())
+    {
+        await wsServer.BroadcastAsync(
+            System.Text.Json.JsonSerializer.Serialize(new { type = "playpause" }));
+    }
 };
-seekTimer.Start();
+controlTimer.Start();
 
 _ = Task.Run(async () =>
 {

@@ -176,6 +176,13 @@ internal class OverlayForm : Form
                 Capture = true;
             }
         }
+        else if (e.Button == MouseButtons.Middle)
+        {
+            if (zone == HitZone.BottomBar)
+            {
+                _playPauseRequested = true;
+            }
+        }
         else if (e.Button == MouseButtons.Right)
         {
             if (zone == HitZone.BottomBar)
@@ -229,6 +236,14 @@ internal class OverlayForm : Form
     {
         var v = _seekRequested;
         _seekRequested = null;
+        return v;
+    }
+
+    private bool _playPauseRequested;
+    public bool ConsumePlayPauseRequest()
+    {
+        var v = _playPauseRequested;
+        _playPauseRequested = false;
         return v;
     }
 
