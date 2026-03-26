@@ -32,27 +32,6 @@
   const isNetflix = hostname === 'www.netflix.com';
   let pipActive = false;
 
-  if (isNetflix) {
-    const s = document.createElement('script');
-    s.textContent = `
-      window.addEventListener('message', function(e) {
-        if (!e.data || e.data.source !== 'maplayer') return;
-        try {
-          var vp = netflix.appContext.state.playerApp.getAPI().videoPlayer;
-          var sid = vp.getAllPlayerSessionIds()[0];
-          if (!sid) return;
-          var player = vp.getVideoPlayerBySessionId(sid);
-          if (e.data.action === 'seek') player.seek(e.data.timeMs);
-          if (e.data.action === 'playpause') {
-            if (player.isPaused()) player.play(); else player.pause();
-          }
-        } catch(err) {}
-      });
-    `;
-    (document.head || document.documentElement).appendChild(s);
-    s.remove();
-  }
-
   function findVideo() {
     return document.querySelector(config.videoSelector) || document.querySelector('video');
   }
