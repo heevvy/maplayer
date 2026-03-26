@@ -10,10 +10,6 @@
       adSkipSelectors: ['[data-uia="player-skip-intro"]', '[data-uia="player-skip-recap"]'],
     },
     'chzzk.naver.com': { videoSelector: 'video', adSkipSelectors: [] },
-    'play.sooplive.co.kr': { videoSelector: 'video', adSkipSelectors: [] },
-    'vod.sooplive.co.kr': { videoSelector: 'video', adSkipSelectors: [] },
-    'www.sooplive.com': { videoSelector: 'video', adSkipSelectors: [] },
-    'sooplive.com': { videoSelector: 'video', adSkipSelectors: [] },
     'laftel.net': { videoSelector: 'video', adSkipSelectors: ['button.videoAdUiSkipButton'] },
     'wp.nexon.com': { videoSelector: 'video', adSkipSelectors: [] },
     'watcha.com': { videoSelector: 'video', adSkipSelectors: [] },
@@ -25,8 +21,20 @@
     'www.disneyplus.com': { videoSelector: 'video', adSkipSelectors: ['.skip__button'] },
   };
 
+  const SOOP_DEFAULT = { videoSelector: 'video', adSkipSelectors: [] };
+
+  function isSoopHost(h) {
+    if (h === 'sooplive.com' || h.endsWith('.sooplive.com')) return true;
+    if (h === 'sooplive.co.kr' || h.endsWith('.sooplive.co.kr')) return true;
+    return false;
+  }
+
+  function resolveConfig(h) {
+    return SITE_CONFIG[h] || (isSoopHost(h) ? SOOP_DEFAULT : null);
+  }
+
   const hostname = window.location.hostname;
-  const config = SITE_CONFIG[hostname];
+  const config = resolveConfig(hostname);
   if (!config) return;
 
   const isNetflix = hostname === 'www.netflix.com';

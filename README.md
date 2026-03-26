@@ -26,7 +26,7 @@ Chrome, Edge, Whale 등 크로미움 기반 브라우저에서 사용할 수 있
 | Wavve | O |
 | Tving | O |
 | Laftel | O |
-| SOOP (sooplive.com / sooplive.co.kr) | - |
+| SOOP (`*.sooplive.com`, `*.sooplive.co.kr` — 예: `vod-origin`, `play-origin`, `vod`, `live`) | - |
 | Chzzk | - |
 | WATCHA | - |
 | Coupang Play | - |
