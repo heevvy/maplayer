@@ -12,6 +12,7 @@
     'chzzk.naver.com': { videoSelector: 'video', adSkipSelectors: [] },
     'laftel.net': { videoSelector: 'video', adSkipSelectors: ['button.videoAdUiSkipButton'] },
     'wp.nexon.com': { videoSelector: 'video', adSkipSelectors: [] },
+    'live.nexon.com': { videoSelector: 'video', adSkipSelectors: [] },
     'watcha.com': { videoSelector: 'video', adSkipSelectors: [] },
     'www.watcha.com': { videoSelector: 'video', adSkipSelectors: [] },
     'www.primevideo.com': { videoSelector: 'video', adSkipSelectors: ['.adSkipButton.skippable', '[data-testid="skip-ad-button"]', '.atvwebplayersdk-skipelements-button'] },

@@ -30,7 +30,7 @@ Chrome, Edge, Whale 등 크로미움 기반 브라우저에서 사용할 수 있
 | Chzzk | - |
 | WATCHA | - |
 | Coupang Play | - |
-| 넥슨라이브 (wp.nexon.com) | - |
+| 넥슨라이브 (live.nexon.com, wp.nexon.com) | - |
 
 ## 설치 방법
 

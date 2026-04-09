@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Maplayer",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "게임 위에 영상을 오버레이하는 PIP 플레이어",
   "author": "dancar",
   "permissions": ["activeTab", "storage"],
@@ -27,6 +27,7 @@
         "https://*.sooplive.co.kr/*",
         "https://laftel.net/*",
         "https://wp.nexon.com/*",
+        "https://live.nexon.com/*",
         "https://watcha.com/*",
         "https://www.watcha.com/*",
         "https://www.primevideo.com/*",
